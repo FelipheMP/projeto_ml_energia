@@ -1,6 +1,7 @@
 from src.ingestion.data_loader import load_raw_data
 from src.preprocessing.data_cleaner import clean_data
 from src.features.feature_engineering import create_temporal_features
+from src.preprocessing.data_transformer import prepare_and_split_data
 
 def main():
   print("Iniciando o pipeline de Inteligência Computacional...")
@@ -18,15 +19,18 @@ def main():
     # 3. Engenharia de Features
     print("3. Criando novas features temporais...")
     df_processed = create_temporal_features(df_clean)
+
+    # 4. Separação Treino/Teste e Padronização
+    print("4. Separando em Treino/Teste (Hold-out cronológico) e aplicando StandardScaler...")
+    X_train, X_test, y_train, y_test, scaler = prepare_and_split_data(
+      df=df_processed, 
+      target_col='Global_active_power', 
+      test_size=0.2
+    )
     
-    print("Pré-processamento concluído com sucesso!\n")
-    print(f"Novo formato (linhas, colunas): {df_processed.shape}")
-    print("\nPrimeiras 5 linhas do dataset processado:")
-    print(df_processed.head())
-    
-    # Salva uma amostra do dado processado para uso nos notebooks (Análise Exploratória)
-    df_processed.to_csv('data/processed/processed_power_consumption.csv')
-    print("\nDataset processado salvo em 'data/processed/processed_power_consumption.csv'")
+    print("\nPipeline de dados concluído com sucesso!")
+    print(f"-> Conjunto de Treinamento: {X_train.shape[0]} registros.")
+    print(f"-> Conjunto de Teste: {X_test.shape[0]} registros.")
 
   except Exception as e:
     print(f"Falha na execução: {e}")
