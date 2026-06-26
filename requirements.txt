@@ -1,7 +1,26 @@
+# Manipulacao de dados
 pandas
 numpy
+
+# Download do dataset (UCI)
+ucimlrepo
+
+# Visualizacao
 matplotlib
 seaborn
+
+# Machine Learning
 scikit-learn
+
+# Persistencia
 joblib
+
+# Testes
 pytest
+
+# Diferenciais: API REST
+fastapi
+uvicorn[standard]
+
+# Diferenciais: Dashboard
+streamlit

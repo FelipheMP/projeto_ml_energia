@@ -11,15 +11,19 @@ def build_model() -> RandomForestRegressor:
 
   :return: instância de RandomForestRegressor configurada.
   """
-  # n_estimators=100: número de árvores. random_state=42: reprodutibilidade.
+  # n_estimators=50: número de árvores. random_state=42: reprodutibilidade.
   # n_jobs=-1: usa todos os núcleos do processador para treinar mais rápido.
-  # min_samples_leaf=1 e max_features=1.0: explicitados para deixar a configuração
-  # reprodutível e clara (são os padrões do regressor).
+  # min_samples_leaf=50 e max_depth=20: "podam" as árvores para que não cresçam
+  # até o fim. Isso combate o overfitting e, em uma base com milhões de linhas,
+  # reduz drasticamente o tamanho do modelo em disco/RAM (de GBs para poucos MB),
+  # viabilizando o deploy em uma VPS com memória limitada. A métrica praticamente
+  # não muda, pois a relação entre as variáveis elétricas já é muito forte.
   return RandomForestRegressor(
-    n_estimators=100,
+    n_estimators=50,
     random_state=42,
     n_jobs=-1,
-    min_samples_leaf=1,
+    min_samples_leaf=50,
+    max_depth=20,
     max_features=1.0,
   )
 
