@@ -20,14 +20,14 @@ MODEL_PATH = "models_saved/random_forest.joblib"
 SCALER_PATH = "models_saved/scaler.joblib"
 METRICS_JSON = "metrics/resultados.json"
 
-st.set_page_config(page_title="Previsao de Consumo de Energia", layout="wide")
-st.title("Previsao de Consumo de Energia Eletrica")
+st.set_page_config(page_title="Previsão de consumo de energia", layout="wide")
+st.title("Previsão de consumo de energia Elétrica")
 st.caption("Random Forest Regressor - Household Power Consumption (UCI)")
 
 
 def _secao_metricas():
-    """Exibe a tabela de metricas salva pelo pipeline."""
-    st.header("Metricas do modelo")
+    """Exibe a tabela de métricas salva pelo pipeline."""
+    st.header("Métricas do modelo")
     if not os.path.exists(METRICS_JSON):
         st.warning("Métricas ainda não geradas. Rode `python main.py` primeiro.")
         return
@@ -41,11 +41,11 @@ def _secao_metricas():
 
 
 def _secao_graficos():
-    """Exibe os graficos PNG gerados na avaliacao."""
-    st.header("Visualizacoes")
+    """Exibe os gráficos em PNG gerados na avaliação."""
+    st.header("Visualizações")
     graficos = {
-        "Importancia das features": "metrics/importancia_features.png",
-        "Real vs. Previsto": "metrics/real_vs_previsto.png",
+        "Importância das features": "metrics/importancia_features.png",
+        "Real vs. previsto": "metrics/real_vs_previsto.png",
         "Residuos": "metrics/residuos.png",
     }
     for titulo, caminho in graficos.items():
@@ -55,8 +55,8 @@ def _secao_graficos():
 
 
 def _secao_previsao():
-    """Formulario para previsao manual usando o modelo salvo."""
-    st.header("Fazer uma previsao")
+    """Formulário para previsão manual usando o modelo salvo."""
+    st.header("Fazer uma previsão")
     if not (os.path.exists(MODEL_PATH) and os.path.exists(SCALER_PATH)):
         st.warning("Modelo não encontrado. Rode `python main.py` para treinar e salvar.")
         return
@@ -66,19 +66,19 @@ def _secao_previsao():
 
     col1, col2, col3 = st.columns(3)
     entrada = {
-        "Global_reactive_power": col1.number_input("Global_reactive_power", value=0.418),
-        "Sub_metering_1": col1.number_input("Sub_metering_1", value=0.0),
-        "Sub_metering_2": col2.number_input("Sub_metering_2", value=1.0),
-        "Sub_metering_3": col2.number_input("Sub_metering_3", value=17.0),
+        "Global_reactive_power": col1.number_input("Potência reativa global", value=0.418),
+        "Sub_metering_1": col1.number_input("Submedição 1", value=0.0),
+        "Sub_metering_2": col2.number_input("Submedição 2", value=1.0),
+        "Sub_metering_3": col2.number_input("Submedição 3", value=17.0),
         "hour": col3.slider("Hora", 0, 23, 17),
         "day_of_week": col3.slider("Dia da semana (0=Seg)", 0, 6, 5),
-        "month": col3.slider("Mes", 1, 12, 12),
+        "month": col3.slider("Mês", 1, 12, 12),
     }
 
     if st.button("Prever consumo"):
         df = pd.DataFrame([entrada])[list(scaler.feature_names_in_)]
         previsao = float(modelo.predict(scaler.transform(df))[0])
-        st.success(f"Global_active_power previsto: **{previsao:.4f} kW**")
+        st.success(f"Potência ativa global prevista: **{previsao:.4f} kW**")
 
 
 _secao_metricas()
