@@ -71,6 +71,60 @@ def plot_feature_importance(
     plt.close()
 
 
+def plot_residuals(
+    y_test: pd.Series,
+    y_pred: np.ndarray,
+    output_path: str,
+) -> None:
+    """
+    Gera e salva um grafico de dispersao dos residuos (erro = real - previsto).
+
+    Interpretacao: residuos distribuidos aleatoriamente em torno de zero indicam um
+    bom ajuste. Padroes (curvas, funis) sugerem que o modelo nao capturou alguma
+    estrutura dos dados.
+
+    :param y_test: valores reais do alvo.
+    :param y_pred: valores previstos pelo modelo.
+    :param output_path: caminho do arquivo de imagem a ser salvo.
+    """
+    residuos = y_test.values - y_pred
+
+    plt.figure(figsize=(8, 5))
+    plt.scatter(y_pred, residuos, s=6, alpha=0.3, color="#2c7fb8")
+    plt.axhline(y=0, color="red", linestyle="--", linewidth=1)
+    plt.title("Analise de Residuos")
+    plt.xlabel("Valor previsto")
+    plt.ylabel("Residuo (real - previsto)")
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=120)
+    plt.close()
+
+
+def build_metrics_table(metrics: Dict[str, float]) -> pd.DataFrame:
+    """
+    Converte o dicionario de metricas em uma tabela (DataFrame) com duas colunas.
+
+    :param metrics: dicionario com nomes de metricas e seus valores.
+    :return: DataFrame com as colunas 'Metrica' e 'Valor'.
+    """
+    return pd.DataFrame(
+        {"Metrica": list(metrics.keys()), "Valor": list(metrics.values())}
+    )
+
+
+def save_metrics_table(metrics: Dict[str, float], output_path: str) -> pd.DataFrame:
+    """
+    Salva a tabela de metricas em CSV e tambem imprime uma versao em Markdown.
+
+    :param metrics: dicionario com as metricas de avaliacao.
+    :param output_path: caminho do arquivo CSV de saida (ex: metrics/tabela_metricas.csv).
+    :return: o DataFrame da tabela gerada.
+    """
+    tabela = build_metrics_table(metrics)
+    tabela.to_csv(output_path, index=False, encoding="utf-8")
+    return tabela
+
+
 def plot_predictions_vs_actual(
     y_test: pd.Series,
     y_pred: np.ndarray,

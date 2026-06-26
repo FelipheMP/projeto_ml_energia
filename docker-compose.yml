@@ -1,0 +1,69 @@
+# Orquestracao dos servicos do projeto na VPS.
+#
+# Fluxo de uso:
+#   1) Treinar o modelo uma unica vez (gera models_saved/ e metrics/):
+#        docker compose --profile train up train
+#   2) Subir API + dashboard em background:
+#        docker compose up -d api dashboard
+#
+# A API e o dashboard compartilham os volumes models_saved/ e metrics/,
+# entao ambos usam o mesmo modelo treinado pelo servico "train".
+
+services:
+  # ------------------------------------------------------------------ #
+  # API REST (FastAPI + Uvicorn) - serve previsoes via HTTP
+  # ------------------------------------------------------------------ #
+  api:
+    build: .
+    image: projeto-ml-energia:latest
+    container_name: energia-api
+    command: uvicorn api:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models_saved:/app/models_saved
+      - ./metrics:/app/metrics
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ------------------------------------------------------------------ #
+  # Dashboard interativo (Streamlit)
+  # ------------------------------------------------------------------ #
+  dashboard:
+    build: .
+    image: projeto-ml-energia:latest
+    container_name: energia-dashboard
+    command: >
+      streamlit run dashboard.py
+      --server.port=8501
+      --server.address=0.0.0.0
+      --server.headless=true
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models_saved:/app/models_saved
+      - ./metrics:/app/metrics
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  # ------------------------------------------------------------------ #
+  # Treino (one-off) - so roda quando chamado com o profile "train"
+  # ------------------------------------------------------------------ #
+  train:
+    build: .
+    image: projeto-ml-energia:latest
+    container_name: energia-train
+    command: python main.py
+    volumes:
+      - ./data:/app/data
+      - ./models_saved:/app/models_saved
+      - ./metrics:/app/metrics
+    profiles:
+      - train
+    restart: "no"

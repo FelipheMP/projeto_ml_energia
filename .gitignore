@@ -3,3 +3,4 @@ __pycache__/
 data/
 models_saved/
 .ipynb_checkpoints/
+.pytest_cache/

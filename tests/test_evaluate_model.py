@@ -8,6 +8,9 @@ from src.evaluation.evaluate_model import (
     evaluate_regression,
     plot_feature_importance,
     plot_predictions_vs_actual,
+    plot_residuals,
+    build_metrics_table,
+    save_metrics_table,
 )
 
 
@@ -73,4 +76,28 @@ def test_plot_predictions_vs_actual_gera_arquivo(tmp_path):
     y_pred = modelo.predict(X_test)
     destino = tmp_path / "real_vs_previsto.png"
     plot_predictions_vs_actual(y_test, y_pred, str(destino))
+    assert destino.exists()
+
+
+def test_plot_residuals_gera_arquivo(tmp_path):
+    """O gráfico de resíduos deve ser salvo em disco."""
+    X_train, X_test, y_train, y_test = _dados_treino_teste()
+    modelo = train_random_forest(X_train, y_train)
+    y_pred = modelo.predict(X_test)
+    destino = tmp_path / "residuos.png"
+    plot_residuals(y_test, y_pred, str(destino))
+    assert destino.exists()
+
+
+def test_build_metrics_table_estrutura():
+    """A tabela de métricas deve ter as colunas 'Metrica' e 'Valor'."""
+    tabela = build_metrics_table({"MAE": 0.1, "R2": 0.95})
+    assert list(tabela.columns) == ["Metrica", "Valor"]
+    assert len(tabela) == 2
+
+
+def test_save_metrics_table_gera_csv(tmp_path):
+    """A tabela de métricas deve ser salva como CSV."""
+    destino = tmp_path / "tabela.csv"
+    save_metrics_table({"MAE": 0.1, "RMSE": 0.3}, str(destino))
     assert destino.exists()
