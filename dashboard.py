@@ -21,8 +21,8 @@ SCALER_PATH = "models_saved/scaler.joblib"
 METRICS_JSON = "metrics/resultados.json"
 
 st.set_page_config(page_title="Previsão de consumo de energia", layout="wide")
-st.title("Previsão de consumo de energia Elétrica")
-st.caption("Random Forest Regressor - Household Power Consumption (UCI)")
+st.title("Previsão de consumo de energia elétrica")
+st.caption("Random Forest Regressor - Consumo de Energia Residencial (UCI)")
 
 
 def _secao_metricas():
@@ -46,7 +46,7 @@ def _secao_graficos():
     graficos = {
         "Importância das features": "metrics/importancia_features.png",
         "Real vs. previsto": "metrics/real_vs_previsto.png",
-        "Residuos": "metrics/residuos.png",
+        "Resíduos": "metrics/residuos.png",
     }
     for titulo, caminho in graficos.items():
         if os.path.exists(caminho):
@@ -66,12 +66,12 @@ def _secao_previsao():
 
     col1, col2, col3 = st.columns(3)
     entrada = {
-        "Global_reactive_power": col1.number_input("Potência reativa global", value=0.418),
-        "Sub_metering_1": col1.number_input("Submedição 1", value=0.0),
-        "Sub_metering_2": col2.number_input("Submedição 2", value=1.0),
-        "Sub_metering_3": col2.number_input("Submedição 3", value=17.0),
+        "Global_reactive_power": col1.number_input("Potência reativa global", value=0.418, help="Potência reativa que circula entre a fonte e a carga, medida em kW."),
+        "Sub_metering_1": col1.number_input("Submedição 1", value=0.0, help="Consumo de energia da cozinha (máquina de lavar louça, forno e micro-ondas)."),
+        "Sub_metering_2": col2.number_input("Submedição 2", value=1.0, help="Consumo de energia da lavanderia (máquina de lavar roupa, ferro de passar)."),
+        "Sub_metering_3": col2.number_input("Submedição 3", value=17.0, help="Consumo de energia de sistemas de climatização (ar condicionado e aquecedor de água). "),
         "hour": col3.slider("Hora", 0, 23, 17),
-        "day_of_week": col3.slider("Dia da semana (0=Seg)", 0, 6, 5),
+        "day_of_week": col3.slider("Dia da semana (0: Segunda-feira)", 0, 6, 5),
         "month": col3.slider("Mês", 1, 12, 12),
     }
 
