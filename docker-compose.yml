@@ -1,18 +1,4 @@
-# Orquestracao dos servicos do projeto na VPS.
-#
-# Fluxo de uso:
-#   1) Treinar o modelo uma unica vez (gera models_saved/ e metrics/):
-#        docker compose --profile train up train
-#   2) Subir API + dashboard em background:
-#        docker compose up -d api dashboard
-#
-# A API e o dashboard compartilham os volumes models_saved/ e metrics/,
-# entao ambos usam o mesmo modelo treinado pelo servico "train".
-
 services:
-  # ------------------------------------------------------------------ #
-  # API REST (FastAPI + Uvicorn) - serve previsoes via HTTP
-  # ------------------------------------------------------------------ #
   api:
     build: .
     image: projeto-ml-energia:latest
@@ -31,9 +17,6 @@ services:
       retries: 3
       start_period: 10s
 
-  # ------------------------------------------------------------------ #
-  # Dashboard interativo (Streamlit)
-  # ------------------------------------------------------------------ #
   dashboard:
     build: .
     image: projeto-ml-energia:latest
@@ -52,9 +35,6 @@ services:
     depends_on:
       - api
 
-  # ------------------------------------------------------------------ #
-  # Treino (one-off) - so roda quando chamado com o profile "train"
-  # ------------------------------------------------------------------ #
   train:
     build: .
     image: projeto-ml-energia:latest
